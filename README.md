@@ -4,14 +4,9 @@ Scrapes Weather Model Data and makes forecasts. The goal of this project is to s
 List of Weather Models that I hope to eventually include:
 
 <ol>
-<li>First item</li>
-<li>Second item</li>
-<li>Third item</li>
-<li>Fourth item</li>
+<li>NOAA NBM, Currently Working on Implementing NBE</li>
+<li>NOAA MOS</li>
+<li>HRRR</li>
+<li>GFS</li>
+<li>NAM CONUS</li>
 </ol>
-
-NOAA NBM, Currently Working on Implementing NBE
-NOAA MOS
-HRRR
-GFS
-NAM CONUS
