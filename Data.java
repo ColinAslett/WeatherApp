@@ -83,6 +83,8 @@ public class Data {
 	}
 	public void printNBE(){
 		for(int i = 0;i < NBE_DAY.size();i++){
+			System.out.println("****************");
+			
 			System.out.println(NBE_DAY.get(i));
 			String maxT="?",minT="?";
 			int maxMax = 0,maxMin = 0,minMax = 0,minMin = 0;
@@ -95,7 +97,6 @@ public class Data {
 				maxMin = Integer.parseInt(maxT) - (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[0]));
 				minMax = Integer.parseInt(minT) + (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[1]));
 				minMin = Integer.parseInt(minT) - (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[1]));
-				checkTempGuidances(Integer.parseInt(maxT),Integer.parseInt(minT),maxMax,maxMin,minMax,minMin);
 			}
 			//Calculating Rain Total For the day
 			int QPF_1 = Integer.parseInt(NBE_12H_QPF.get(i)[0]);
@@ -149,8 +150,65 @@ public class Data {
 			System.out.println("12-24 UTC Time Ice Totals in 1/100th Inches: " + NBE_12H_ICE.get(i)[1]);
 			System.out.println("Total Ice in 1/100th Inches: " + Total_ICE);
 			
-			System.out.println("*******");
+			//Guidances
+			//Temperature Guidances
+			if(maxT != null && minT != null){
+				checkTempGuidances(Integer.parseInt(maxT),Integer.parseInt(minT),maxMax,maxMin,minMax,minMin);
+			}
+			//Sustained Wind, Wind Gust, Thunderstorm guidances
+			if(NBE_WIND_SPEED.get(i)[0] != null && NBE_WIND_SPEED.get(i)[1] != null){
+				checkStormGuidances(Math.max(Integer.parseInt(NBE_WIND_SPEED.get(i)[0]), Integer.parseInt(NBE_WIND_SPEED.get(i)[1])),
+						Math.max(Integer.parseInt(NBE_GUSTS.get(i)[0]), Integer.parseInt(NBE_GUSTS.get(i)[1])),
+						Math.max(Integer.parseInt(NBE_12H_THUNDERSTORM.get(i)[0]),Integer.parseInt(NBE_12H_THUNDERSTORM.get(i)[1]))
+						);
+			}
+			//Heavy Rain, Heavy Snow
+			System.out.println("****************");
 		}
+	}
+	//Sustained Winds, Gust Winds, Thunderstorm Probabilities
+	private void checkStormGuidances(int MAX_SUS_WINDS,int MAX_WIND_GUSTS,int THUNDER_PROB) {
+		int[] MAX_SUS_WIND_VALUES = {25,35,45,55,65};
+		int[] WIND_GUST_VALUES = {35,47,59,71,83};
+		int[] THUNDER_VALUES = {15,23,31,39,47,55};
+		String SUS_WIND_GUIDANCE = "";
+		String WIND_GUST_GUIDANCE = "";
+		String THUNDER_GUIDANCE  = "";
+		for(int i = 0;i < MAX_SUS_WIND_VALUES.length;i++){
+			if(MAX_SUS_WINDS >= MAX_SUS_WIND_VALUES[i]){
+				SUS_WIND_GUIDANCE += "I";
+			}
+		}
+		for(int i = 0;i < WIND_GUST_VALUES.length;i++){
+			if(MAX_WIND_GUSTS >= WIND_GUST_VALUES[i]){
+				WIND_GUST_GUIDANCE += "I";
+			}
+		}		
+		for(int i = 0;i < THUNDER_VALUES.length;i++){
+			if(THUNDER_PROB >= THUNDER_VALUES[i]){
+				THUNDER_GUIDANCE += "I";
+			}
+		}		
+		if(SUS_WIND_GUIDANCE.length() == 0){
+			System.out.println("NO SUSTAINED WINDS GUIDANCE");
+		}
+		else{
+			System.out.println("SUSTAINED WIND GUIDANCE LEVEL: " + SUS_WIND_GUIDANCE);
+		}
+		
+		if(WIND_GUST_GUIDANCE.length() == 0){
+			System.out.println("NO WIND GUST GUIDANCE");
+		}
+		else{
+			System.out.println("WIND GUST GUIDANCE LEVEL: " + WIND_GUST_GUIDANCE);
+		}
+		if(THUNDER_GUIDANCE.length() == 0){
+			System.out.println("NO THUNDERSTORM GUIDANCE");
+		}
+		else{
+			System.out.println("THUNDERSTORM GUIDANCE LEVEL: " + THUNDER_GUIDANCE);
+		}
+		
 	}
 	private void checkTempGuidances(int maxT,int minT,int maxMax,int maxMin,int minMax,int minMin) {
 		int[] HEAT_GUIDANCE_TEMPS = {95,100,105,110,115,120}; 
