@@ -19,8 +19,9 @@ public class Main {
 	//Downloading Class that handles all the downloading and parsing of the info
 	Downloader downloader = new Downloader(data);
 	//Station Name, Station table at: https://vlab.ncep.noaa.gov/web/mdl/nbm-stations-v4.0 or NOAA Forecast
-	String STATION = "KMGM";
-	
+	String STATION = "KHIO";
+	//NOAA NBM Cycle Times
+	int[] NBM_CYCLE_TIMES = {1,7,13,19};
 	public Main() throws Exception{
 		RETRIEVE_NOAA_NBM_DATA();
 	}
@@ -44,16 +45,35 @@ public class Main {
 		String month = Integer.toString(cal.get(Calendar.MONTH)+1);//Months start at 1 not 0
 		String day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
 		NOAA_NBM_BASE_CYCLE = Integer.toString(cal.get(Calendar.HOUR_OF_DAY)-1);
+		int temp_time = Integer.parseInt(NOAA_NBM_BASE_CYCLE);
+		//NBP has special rules, needs to be on a cycle time(01,7,13,19)
+		int index = 0;
+		for(int i = 0;i < NBM_CYCLE_TIMES.length;i++){
+			if(temp_time > NBM_CYCLE_TIMES[i]){
+				index++;
+			}
+		}
+		if(index != 0){
+			NOAA_NBM_BASE_CYCLE = Integer.toString(NBM_CYCLE_TIMES[index-1]);
+		}
+		else{//We have to go back a day and index 3
+			day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH)-1);
+			NOAA_NBM_BASE_CYCLE = Integer.toString(NBM_CYCLE_TIMES[3]);
+		}
 		
 		if(month.length() == 1){
 			//There needs to be a 0 before the month if its only 1 digit long
 			month = "0" + month;
 		}
-		
 		NOAA_NBM_BASE_DATE = year+month+day;
+
+		System.out.println(NOAA_NBM_BASE_DATE + " , " + NOAA_NBM_BASE_CYCLE +" UTC Time");
 		//Building the Proper Strings
 		String NOAA_NBM_NBE_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBE + NOAA_NBM_BASE_CYCLE + "z";
-		downloader.NOAA_NBE(NOAA_NBM_NBE_LINK,STATION);
+		String NOAA_NBM_NBP_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBP + NOAA_NBM_BASE_CYCLE + "z";
+		
+		//downloader.NOAA_NBE(NOAA_NBM_NBE_LINK,STATION);
+		downloader.NOAA_NBP(NOAA_NBM_NBP_LINK,STATION);
 		
 		
 	}
