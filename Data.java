@@ -152,53 +152,32 @@ public class Data {
 			System.out.println("*******");
 		}
 	}
-	//This Function can probably be condensed
 	private void checkTempGuidances(int maxT,int minT,int maxMax,int maxMin,int minMax,int minMin) {
-		//Heat Tiers
-		String HeatTier="?";
-		if(maxT >= 90){
-			HeatTier="I";
-			if(maxT >= 95){
-				HeatTier="II";
-			}
-			if(maxT >= 100){
-				HeatTier="III";
-			}
-			if(maxT>= 105){
-				HeatTier="IV";
-			}
-			if(maxT>= 110){
-				HeatTier="V";
+		int[] HEAT_GUIDANCE_TEMPS = {95,100,105,110,115,120}; 
+		int[] COLD_GUIDANCE_TEMPS = {15,5,-5,-15,-25,-35};
+		String HEAT_GUIDANCE = "";
+		String COLD_GUIDANCE = "";
+		for(int i = 0;i < HEAT_GUIDANCE_TEMPS.length;i++){
+			if(maxT >= HEAT_GUIDANCE_TEMPS[i]){
+				HEAT_GUIDANCE += "I";
 			}
 		}
-		//Cold Tiers
-		String ColdTier="?";
-		if(minT <= 25){
-			ColdTier="I";
-			if(minT <= 15){
-				ColdTier="II";
-			}
-			if(minT <= 5){
-				ColdTier="III";
-			}
-			if(minT <= -5){
-				ColdTier="IV";
-			}
-			if(minT <= -15){
-				ColdTier="V";
+		for(int i = 0;i < COLD_GUIDANCE_TEMPS.length;i++){
+			if(maxT <= COLD_GUIDANCE_TEMPS[i]){
+				COLD_GUIDANCE += "I";
 			}
 		}
-		if(HeatTier.equals("?")){
-			System.out.println("No Heat Guidances");
+		if(HEAT_GUIDANCE.length() == 0){
+			System.out.println("NO HEAT GUIDANCES");
 		}
 		else{
-			System.out.println("Heat Guidance Tier: " + HeatTier);
+			System.out.println("HEAT GUIDANCE LEVEL: " + HEAT_GUIDANCE);
 		}
-		if(ColdTier.equals("?")){
-			System.out.println("No Cold Guidances");
+		if(COLD_GUIDANCE.length() == 0){
+			System.out.println("NO COLD GUIDANCES");
 		}
 		else{
-			System.out.println("Cold Guidance Tier: " + ColdTier);
+			System.out.println("COLD GUIDANCE LEVEL: " + COLD_GUIDANCE);
 		}
 	}
 }
