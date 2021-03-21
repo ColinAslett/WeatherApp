@@ -12,12 +12,9 @@ public class Data {
 	ArrayList<String[]> NBE_12H_QPF = new ArrayList<>();
 	ArrayList<String[]> NBE_12H_THUNDERSTORM = new ArrayList<>();
 	ArrayList<String[]> NBE_12H_SNOW = new ArrayList<>();
-	
+	ArrayList<String[]> NBE_12H_ICE = new ArrayList<>();
 	
 	public void NBE(ArrayList<String> nbe) {
-		for(int i = 0;i < nbe.size();i++){
-			System.out.println(nbe.get(i));
-		}
 		//Changing Raw Data to useful data
 		for(int i = 0;i < nbe.size();i++){
 			System.out.println(nbe.get(i));
@@ -32,105 +29,46 @@ public class Data {
 						//Taking out the abbreviations so we jsut have numbers
 						temp[a] = temp[a].substring(4);
 					}
-					//UTC TIME
+					//Stuff
+					String raw_temp[] = temp[a].split("\\s+");
+					String[] extra_temp = null;
+					extra_temp = new String[2];
+					if(raw_temp.length > 1){
+						extra_temp[0] = raw_temp[1];
+					}
+					if(raw_temp.length == 3){
+						extra_temp[1] = raw_temp[2];
+					}
+					//Moving the Data to the correct ArrayList
 					if(i == 1){
-						String raw_time[] = temp[a].split("\\s+");
-						String[] time = null;
-						time = new String[2];
-						time[0] = raw_time[1];
-						if(raw_time.length == 3){
-							time[1] = raw_time[2];
-						}
-						NBE_UTC.add(time);
+						NBE_UTC.add(extra_temp);
 					}
-					//Skipping FHR which is i = 2
-					
-					//TXN is either max or min, max on the 00 UTC, min on the 12 UTC slot
 					else if(i == 3){
-						String raw_txn[] = temp[a].split("\\s+");
-						String[] txn = null;
-						txn = new String[2];
-						txn[0] = raw_txn[1];
-						if(raw_txn.length == 3){
-							txn[1] = raw_txn[2];
-						}
-						NBE_MAX_MIN.add(txn);
+						NBE_MAX_MIN.add(extra_temp);
 					}
-					//XND is STD of max or min
 					else if(i == 4){
-						String raw_xnd[] = temp[a].split("\\s+");
-						String[] xnd = null;
-						xnd = new String[2];
-						xnd[0] = raw_xnd[1];
-						if(raw_xnd.length == 3){
-							xnd[1] = raw_xnd[2];
-						}
-						NBE_MAX_MIN_STD.add(xnd);
+						NBE_MAX_MIN_STD.add(extra_temp);
 					}
-					//Sky Cover
 					else if(i == 9){
-						String raw_sky[] = temp[a].split("\\s+");
-						String[] sky = null;
-						sky = new String[2];
-						sky[0] = raw_sky[1];
-						if(raw_sky.length == 3){
-							sky[1] = raw_sky[2];
-						}
-						NBE_SKY_COVER.add(sky);
+						NBE_SKY_COVER.add(extra_temp);
 					}
-					//Sustained Wind Speed
 					else if(i == 12){
-						String raw_wsp[] = temp[a].split("\\s+");
-						String[] wsp = null;
-						wsp = new String[2];
-						wsp[0] = raw_wsp[1];
-						if(raw_wsp.length == 3){
-							wsp[1] = raw_wsp[2];
-						}
-						NBE_WIND_SPEED.add(wsp);
+						NBE_WIND_SPEED.add(extra_temp);
 					}
-					//Wind Gusts
 					else if(i == 14){
-						String raw_gst[] = temp[a].split("\\s+");
-						String[] gst = null;
-						gst = new String[2];
-						gst[0] = raw_gst[1];
-						if(raw_gst.length == 3){
-							gst[1] = raw_gst[2];
-						}
-						NBE_GUSTS.add(gst);						
+						NBE_GUSTS.add(extra_temp);
 					}
-					//12 Hour QPF
 					else if(i == 17){
-						String raw_qpf[] = temp[a].split("\\s+");
-						String[] qpf = null;
-						qpf = new String[2];
-						qpf[0] = raw_qpf[1];
-						if(raw_qpf.length == 3){
-							qpf[1] = raw_qpf[2];
-						}
-						NBE_12H_QPF.add(qpf);						
+						NBE_12H_QPF.add(extra_temp);
 					}
-					//12 Hour ThunderStorm Probability
 					else if(i == 20){
-						String raw_t12[] = temp[a].split("\\s+");
-						String[] t12 = null;
-						t12 = new String[2];
-						t12[0] = raw_t12[1];
-						if(raw_t12.length == 3){
-							t12[1] = raw_t12[2];
-						}
-						NBE_12H_THUNDERSTORM.add(t12);						
+						NBE_12H_THUNDERSTORM.add(extra_temp);
 					}
 					else if(i == 25){
-						String raw_s12[] = temp[a].split("\\s+");
-						String[] s12 = null;
-						s12 = new String[2];
-						s12[0] = raw_s12[1];
-						if(raw_s12.length == 3){
-							s12[1] = raw_s12[2];
-						}
-						NBE_12H_SNOW.add(s12);						
+						NBE_12H_SNOW.add(extra_temp);
+					}
+					else if(i == 27){
+						NBE_12H_ICE.add(extra_temp);
 					}
 				}
 			}
@@ -166,12 +104,19 @@ public class Data {
 				int QPF_2 = Integer.parseInt(NBE_12H_QPF.get(i)[1]);
 				Total_QPF = QPF_1 + QPF_2;
 			}
-			//Calculating ThunderStorm Probability for the whole day
+			//Calculating SNow Amounts for the whole day
 			int S12_1 = Integer.parseInt(NBE_12H_SNOW.get(i)[0]);
 			int Total_SNOW = S12_1;
 			if(NBE_12H_SNOW.get(i)[1] != null){
 				int S12_2 = Integer.parseInt(NBE_12H_SNOW.get(i)[1]);
 				Total_SNOW = S12_1 + S12_2;
+			}
+			//Calculating Ice Amounts for the whole day
+			int I12_1 = Integer.parseInt(NBE_12H_ICE.get(i)[0]);
+			int Total_ICE = I12_1;
+			if(NBE_12H_ICE.get(i)[1] != null){
+				int I12_2 = Integer.parseInt(NBE_12H_SNOW.get(i)[1]);
+				Total_ICE = I12_1 + I12_2;
 			}
 			//Max and Min Temperatures for the Day
 			System.out.println("Max Temp: " + maxT);
@@ -199,6 +144,11 @@ public class Data {
 			System.out.println("0-12 UTC Time Snow Total in 1/10th Inches: " + NBE_12H_SNOW.get(i)[0]);
 			System.out.println("12-24 UTC Time Snow Total in 1/10th Inches: " + NBE_12H_SNOW.get(i)[1]);	
 			System.out.println("Total Snow in 1/10th Inches: " + Total_SNOW);
+			//Ice Amounts
+			System.out.println("0-12 UTC Time Ice Totals in 1/100th Inches: " + NBE_12H_ICE.get(i)[0]);
+			System.out.println("12-24 UTC Time Ice Totals in 1/100th Inches: " + NBE_12H_ICE.get(i)[1]);
+			System.out.println("Total Ice in 1/100th Inches: " + Total_ICE);
+			
 			System.out.println("*******");
 		}
 	}
