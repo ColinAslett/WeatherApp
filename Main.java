@@ -19,7 +19,7 @@ public class Main {
 	//Downloading Class that handles all the downloading and parsing of the info
 	Downloader downloader = new Downloader(data);
 	//Station Name, Station table at: https://vlab.ncep.noaa.gov/web/mdl/nbm-stations-v4.0 or NOAA Forecast
-	String STATION = "KHIO";
+	String STATION = "KMGM";
 	
 	public Main() throws Exception{
 		RETRIEVE_NOAA_NBM_DATA();
@@ -28,16 +28,14 @@ public class Main {
 		//Getting the Hour of the day, 24HR Time
 		
 		Date date = new Date();
-		String strDateFormat = "HH";
-		DateFormat dateFormat = new SimpleDateFormat(strDateFormat);
-		String formattedDate = dateFormat.format(date);
+
 		
 		//Getting the latest Cycle minus 5 hour because sometimes its late and 7 hours because UTC is 7 hours ahead of
 		//PST Time
 		
 		//THIS WONT WORK cause it could be negative sometimes
 		//NOAA_NBM_BASE_CYCLE = Integer.toString((Integer.parseInt(formattedDate) - 12));
-		NOAA_NBM_BASE_CYCLE = "12";
+		NOAA_NBM_BASE_CYCLE = "01";
 		//Getting the Day, Month, and Year
 		
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -45,6 +43,7 @@ public class Main {
 		String year = Integer.toString(cal.get(Calendar.YEAR));
 		String month = Integer.toString(cal.get(Calendar.MONTH)+1);//Months start at 1 not 0
 		String day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
+		NOAA_NBM_BASE_CYCLE = Integer.toString(cal.get(Calendar.HOUR_OF_DAY)-1);
 		
 		if(month.length() == 1){
 			//There needs to be a 0 before the month if its only 1 digit long
