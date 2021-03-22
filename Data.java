@@ -13,7 +13,21 @@ public class Data {
 	ArrayList<String[]> NBE_12H_THUNDERSTORM = new ArrayList<>();
 	ArrayList<String[]> NBE_12H_SNOW = new ArrayList<>();
 	ArrayList<String[]> NBE_12H_ICE = new ArrayList<>();
+	//NBP Data
 	
+	
+	//NAM Data
+	ArrayList<TRIPLET> NAM_DATA = new ArrayList<>();
+	//HRRR Data
+	ArrayList<TRIPLET> HRRR_DATA = new ArrayList<>();	
+	
+	
+	public void NBP(ArrayList<String> nbp){
+		for(int i = 0;i < nbp.size();i++){
+			System.out.println(nbp.get(i));
+		}
+	}
+	//NBE
 	public void NBE(ArrayList<String> nbe) {
 		//Changing Raw Data to useful data
 		for(int i = 0;i < nbe.size();i++){
@@ -236,6 +250,184 @@ public class Data {
 		}
 		else{
 			System.out.println("COLD GUIDANCE LEVEL: " + COLD_GUIDANCE);
+		}
+	}
+	//NAM SEVERE WEATHER 
+	public void NAM(ArrayList<String> temp_NAM) {
+		// TODO Auto-generated method stub
+		String line;
+		for(int i = 0;i < temp_NAM.size();i++){
+			line = temp_NAM.get(i);
+			if(line.contains("STIM")){
+				ArrayList<String> TEMP = new ArrayList<>();
+				TEMP.add(temp_NAM.get(i));
+				TEMP.add(temp_NAM.get(i+1));
+				TEMP.add(temp_NAM.get(i+2));
+				TEMP.add(temp_NAM.get(i+3));
+				TEMP.add(temp_NAM.get(i+4));
+				TRIPLET T = new TRIPLET(TEMP);
+				NAM_DATA.add(T);
+			}
+		}
+	}
+	public void HRRR(ArrayList<String> temp_HRRR) {
+		// TODO Auto-generated method stub
+		String line;
+		for(int i = 0;i < temp_HRRR.size();i++){
+			line = temp_HRRR.get(i);
+			if(line.contains("STIM")){
+				ArrayList<String> TEMP = new ArrayList<>();
+				TEMP.add(temp_HRRR.get(i));
+				TEMP.add(temp_HRRR.get(i+1));
+				TEMP.add(temp_HRRR.get(i+2));
+				TEMP.add(temp_HRRR.get(i+3));
+				TEMP.add(temp_HRRR.get(i+4));
+				TRIPLET T = new TRIPLET(TEMP);
+				NAM_DATA.add(T);
+			}
+		}		
+	}
+}
+class TRIPLET{
+	ArrayList<String> raw_data = new ArrayList<>();
+	//Metrics
+	String Forecast_Hour;
+	String Showalter_Index;
+	String Lifted_Index;
+	String Sweat_Index;
+	String Total_Total_Index;
+	String CAPE;
+	String Bulk_RichardSon_Number;
+	int FH;
+	double SI;
+	double LI;
+	double SWI;
+	double TTI;
+	double CAPE_VALUE;
+	double BRN;
+	String SI_ANALYSIS;
+	String LI_ANALYSIS;
+	String CAPE_ANALYSIS;
+	String BRN_ANALYSIS;
+	public TRIPLET(ArrayList<String> rd){
+		raw_data = rd;
+		interpret_Data();
+	}
+	private void interpret_Data() {
+		//1st Line contains Forecast Hour
+		String Forecast_Hour = raw_data.get(0).substring(7);
+		Forecast_Hour = Forecast_Hour.replaceAll("\\s","");
+		FH = Integer.parseInt(Forecast_Hour);
+		//System.out.println(Forecast_Hour);
+		//Showalter Index: http://tornado.sfsu.edu/geosciences/classes/m201/buoyancy/SkewTMastery/mesoprim/skewt/ssi1.htm
+		Showalter_Index = raw_data.get(1).substring(7,12);
+		Showalter_Index = Showalter_Index.replaceAll("\\s", "");
+		SI = Double.parseDouble(Showalter_Index);
+		if(SI > 3){
+			SI_ANALYSIS = "There is No Threat of Severe Weather";
+		}
+		else if(SI <= 3 && SI >= 1){
+			SI_ANALYSIS = "Rain Showers with possibly some thunderstorms";
+		}
+		else if(SI <= 1 && SI >= -2.5){
+			SI_ANALYSIS = "Thundershowers are likely";
+		}
+		else if(SI <= -2.5 && SI >= -6){
+			SI_ANALYSIS = "Severe Thunderstorms are possible";
+		}
+		else if(SI <= -6){
+			SI_ANALYSIS = "Severe Thunderstorms are possible with Tornadoes a possibility";
+		}
+		//Lifted Index: http://tornado.sfsu.edu/geosciences/classes/m201/buoyancy/SkewTMastery/mesoprim/skewt/li.htm
+		Lifted_Index = Equal_Counter(2,1).replaceAll("\\s", "");
+		LI = Double.parseDouble(Lifted_Index);
+		if(LI > -1){
+			LI_ANALYSIS = "No Potential for Severe Weather";
+		}
+		if(LI <= -1){
+			LI_ANALYSIS = "Weak Potential for Severe Weather";
+		}
+		if(LI <= -3){
+			LI_ANALYSIS = "Moderate Potential for Severe Weather";
+		}
+		if(LI <= -5){
+			LI_ANALYSIS = "Strong Potential for Severe Weather";
+		}		
+		//Sweat Index: http://weather.uky.edu/about_sweat.htm#:~:text=The%20SWEAT%20Index%20evaluates%20the,between%20850%20and%20500%20mb).
+		Sweat_Index = Equal_Counter(3,1).replaceAll("\\s", "");
+		SWI = Double.parseDouble(Sweat_Index);
+		//LCLP: https://www.weather.gov/source/zhu/ZHU_Training_Page/convective_parameters/Sounding_Stuff/MesoscaleParameters.html
+		//This one seems a bit complicated, not to get but to interpret
+		//Totals Total Index: http://tornado.sfsu.edu/geosciences/classes/m201/buoyancy/SkewTMastery/mesoprim/skewt/tt.htm#:~:text=Total%20Totals%20Index&text=The%20Total%20Totals%20index%20(TT,and%20the%20resulting%20TT%20value.
+		Total_Total_Index = Equal_Counter(3,2).replaceAll("\\s", "");
+		TTI = Double.parseDouble(Total_Total_Index);
+		//CAPE: http://tornado.sfsu.edu/geosciences/classes/m201/buoyancy/SkewTMastery/mesoprim/skewt/cape.htm
+		CAPE = Equal_Counter(4,2).replaceAll("\\s", "");
+		CAPE_VALUE = Double.parseDouble(CAPE);
+		if(CAPE_VALUE >= 0 && CAPE_VALUE < 1000 && SI <= -2.5 && LI <= -2.5){
+			CAPE_ANALYSIS = CAPE + ", This would minimally support the idea of potential severe weather";
+		}
+		else if(CAPE_VALUE >= 1000 && CAPE_VALUE < 2000 &&  SI <= -2.5 && LI <= -2.5){
+			CAPE_ANALYSIS = CAPE + ", This would moderately support the idea of potential severe weather";
+		}
+		else if(CAPE_VALUE >= 2000 && CAPE_VALUE < 3000 &&  SI <= -2.5 && LI <= -2.5){
+			CAPE_ANALYSIS = CAPE + ", This would strongly support the idea of potential severe weather";
+		}
+		else if(CAPE_VALUE >= 3000 && SI <= -2.5 && LI <= -2.5){
+			CAPE_ANALYSIS = CAPE + ", This would extremely  support the idea of potential severe weather";
+		}
+		else if(CAPE_VALUE >= 1000){
+			CAPE_ANALYSIS = CAPE + ", While the SI and LI Indices don't necessairly project severe weather, CAPE Values"
+					+ " are nonetheless elevated meaning a potential for severe weather remains";
+		}
+		else{
+			CAPE_ANALYSIS = CAPE + ", This would not support the idea of potential severe weather";
+		}
+		//Bulk Richardson Number: http://www.theweatherprediction.com/habyhints/315/#:~:text=BRN%20(Bulk%20Richardson%20Number)%20is,height)%20in%20a%20thunderstorm%20environment.&text=The%20extreme%20CAPE%20value%20leads%20to%20the%20high%20BRN.
+		Bulk_RichardSon_Number = Equal_Counter(1,4).replaceAll("\\s", "");
+		BRN = Double.parseDouble(Bulk_RichardSon_Number);
+		if(BRN <= 10){
+			BRN_ANALYSIS = "Environemnt Unlikely to Generate SuperCells, SHEAR too high but can potentially still generate Supercells";
+		} 
+		else if(BRN < 20 && BRN >= 10){
+			BRN_ANALYSIS = "Environment Optimal for Supercell Storms";
+		}
+		else if(BRN < 45 && BRN >= 20){
+			BRN_ANALYSIS = "Environment able to generate SuperCell Storms";
+		}
+		else{
+			BRN_ANALYSIS = "Environemnt Unlikely to Generate SuperCells, CAPE too High but some pulse storms";
+		}
+		printSynopsis();
+	}
+	private void printSynopsis() {
+		System.out.println("***************");
+		System.out.println("Effective for Forecast Hour: " + FH);
+		System.out.println("Showalter Index is " + SI + ", which indicates that " + SI_ANALYSIS);
+		System.out.println("Lifted Index is " + LI + ", which indicates that there is a " + LI_ANALYSIS);
+		System.out.println("CAPE values are: " + CAPE_ANALYSIS);
+		System.out.println("Bulk Richardson Number value is: " + Bulk_RichardSon_Number + " ," + BRN_ANALYSIS);
+		System.out.println("***************");
+	}
+	//Equal Counter Function
+	private String Equal_Counter(int num,int line){
+		String temp = "";
+		int EQ_COUNTER = 0;
+		int index = 0;
+		for(int i = 0;i < raw_data.get(line).length();i++){
+			if(raw_data.get(line).charAt(i) == '='){
+				EQ_COUNTER++;
+			}
+			if(EQ_COUNTER==num){
+				index = i+2;
+				break;
+			}
+		}	
+		if(num != 4 && line != 4){
+			return (raw_data.get(line).substring(index,index+5));
+		}
+		else{
+			return (raw_data.get(line).substring(index,raw_data.get(line).length()));
 		}
 	}
 }
