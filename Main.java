@@ -1,296 +1,128 @@
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
-public class Data {
-	//NBE Data
-	ArrayList<String> NBE_DAY = new ArrayList<>();
-	ArrayList<String[]> NBE_UTC = new ArrayList<>();
-	ArrayList<String[]> NBE_MAX_MIN = new ArrayList<>();
-	ArrayList<String[]> NBE_MAX_MIN_STD = new ArrayList<>();
-	ArrayList<String[]> NBE_SKY_COVER = new ArrayList<>();
-	ArrayList<String[]> NBE_WIND_SPEED = new ArrayList<>();
-	ArrayList<String[]> NBE_GUSTS = new ArrayList<>();
-	ArrayList<String[]> NBE_12H_QPF = new ArrayList<>();
-	ArrayList<String[]> NBE_12H_THUNDERSTORM = new ArrayList<>();
-	ArrayList<String[]> NBE_12H_SNOW = new ArrayList<>();
-	ArrayList<String[]> NBE_12H_ICE = new ArrayList<>();
-	//NBP Data
-	
-	
-	//NAM Data
-	ArrayList<NAM_TRIPLET> NAM_DATA = new ArrayList<>();
-	public void NBP(ArrayList<String> nbp){
-		for(int i = 0;i < nbp.size();i++){
-			System.out.println(nbp.get(i));
-		}
-	}
-	//NBE
-	public void NBE(ArrayList<String> nbe) {
-		//Changing Raw Data to useful data
-		for(int i = 0;i < nbe.size();i++){
-			System.out.println(nbe.get(i));
-			String[] temp = nbe.get(i).split("\\|");
-			for(int a = 0;a < temp.length;a++){
-				if(i == 0){
-					temp[a] = temp[a].replaceAll("\\s","");
-					NBE_DAY.add(temp[a]);
-				}
-				else{
-					if(a == 0){
-						//Taking out the abbreviations so we jsut have numbers
-						temp[a] = temp[a].substring(4);
-					}
-					//Stuff
-					String raw_temp[] = temp[a].split("\\s+");
-					String[] extra_temp = null;
-					extra_temp = new String[2];
-					if(raw_temp.length > 1){
-						extra_temp[0] = raw_temp[1];
-					}
-					if(raw_temp.length == 3){
-						extra_temp[1] = raw_temp[2];
-					}
-					//Moving the Data to the correct ArrayList
-					if(i == 1){
-						NBE_UTC.add(extra_temp);
-					}
-					else if(i == 3){
-						NBE_MAX_MIN.add(extra_temp);
-					}
-					else if(i == 4){
-						NBE_MAX_MIN_STD.add(extra_temp);
-					}
-					else if(i == 9){
-						NBE_SKY_COVER.add(extra_temp);
-					}
-					else if(i == 12){
-						NBE_WIND_SPEED.add(extra_temp);
-					}
-					else if(i == 14){
-						NBE_GUSTS.add(extra_temp);
-					}
-					else if(i == 17){
-						NBE_12H_QPF.add(extra_temp);
-					}
-					else if(i == 20){
-						NBE_12H_THUNDERSTORM.add(extra_temp);
-					}
-					else if(i == 25){
-						NBE_12H_SNOW.add(extra_temp);
-					}
-					else if(i == 27){
-						NBE_12H_ICE.add(extra_temp);
-					}
-				}
-			}
-		}
-		for(int i = 0;i < NBE_MAX_MIN_STD.size();i++){
-			for(int a = 0;a < NBE_MAX_MIN_STD.get(i).length;a++){
-				//System.out.println(NBE_MAX_MIN_STD.get(i)[a]);
-			}
-			//System.out.println("*******");
-		}
-		printNBE();
-	}
-	public void printNBE(){
-		for(int i = 0;i < NBE_DAY.size();i++){
-			System.out.println("****************");
-			
-			System.out.println(NBE_DAY.get(i));
-			String maxT="?",minT="?";
-			int maxMax = 0,maxMin = 0,minMax = 0,minMin = 0;
-			//Temperature Stuff
-			maxT = NBE_MAX_MIN.get(i)[0];
-			minT = NBE_MAX_MIN.get(i)[1];
-			
-			if(NBE_MAX_MIN_STD.get(i)[0] != null && NBE_MAX_MIN_STD.get(i)[1] != null && (maxT != null) && (minT != null)){
-				maxMax = Integer.parseInt(maxT) + (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[0]));
-				maxMin = Integer.parseInt(maxT) - (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[0]));
-				minMax = Integer.parseInt(minT) + (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[1]));
-				minMin = Integer.parseInt(minT) - (3*Integer.parseInt(NBE_MAX_MIN_STD.get(i)[1]));
-			}
-			//Calculating Rain Total For the day
-			int QPF_1 = Integer.parseInt(NBE_12H_QPF.get(i)[0]);
-			int Total_QPF = QPF_1;
-			if(NBE_12H_QPF.get(i)[1] != null){
-				int QPF_2 = Integer.parseInt(NBE_12H_QPF.get(i)[1]);
-				Total_QPF = QPF_1 + QPF_2;
-			}
-			//Calculating SNow Amounts for the whole day
-			int S12_1 = Integer.parseInt(NBE_12H_SNOW.get(i)[0]);
-			int Total_SNOW = S12_1;
-			if(NBE_12H_SNOW.get(i)[1] != null){
-				int S12_2 = Integer.parseInt(NBE_12H_SNOW.get(i)[1]);
-				Total_SNOW = S12_1 + S12_2;
-			}
-			//Calculating Ice Amounts for the whole day
-			int I12_1 = Integer.parseInt(NBE_12H_ICE.get(i)[0]);
-			int Total_ICE = I12_1;
-			if(NBE_12H_ICE.get(i)[1] != null){
-				int I12_2 = Integer.parseInt(NBE_12H_SNOW.get(i)[1]);
-				Total_ICE = I12_1 + I12_2;
-			}
-			//Max and Min Temperatures for the Day
-			System.out.println("Max Temp: " + maxT);
-			System.out.println("Min Temp: " + minT);
-			//Range of Max and Min Temperatures within 3 Standard Deviations
-			System.out.println("99.7% Confidence Max Temp: " + Integer.toString(maxMax) + " - " + Integer.toString(maxMin));
-			System.out.println("99.7% Confidence Low Temp: " + Integer.toString(minMax) + " - " + Integer.toString(minMin));
-			//Sky Cover 
-			System.out.println("Sky Cover at 00 UTC: " + NBE_SKY_COVER.get(i)[0] + "%");
-			System.out.println("Sky Cover at 12 UTC: " + NBE_SKY_COVER.get(i)[1] + "%");
-			//Wind Speed
-			System.out.println("Wind Speed at 00 UTC: " + NBE_WIND_SPEED.get(i)[0] + "(KNOTS)");
-			System.out.println("Wind Speed at 12 UTC: " + NBE_WIND_SPEED.get(i)[1] + "(KNOTS)");
-			//Wind Gusts
-			System.out.println("Wind Gusts at 00 UTC: " + NBE_GUSTS.get(i)[0] + "(KNOTS)");
-			System.out.println("Wind Gusts at 12 UTC: " + NBE_GUSTS.get(i)[1] + "(KNOTS)");
-			//NBE_12H_QPF 
-			System.out.println("0-12 UTC Time Rain Total in 1/100th Inches: " + NBE_12H_QPF.get(i)[0]);
-			System.out.println("12-24 UTC Time Rain Total in 1/100th Inches: " + NBE_12H_QPF.get(i)[1]);
-			System.out.println("Total Rain For Day in 1/100th Inches: " + Total_QPF);
-			//ThunderStorm Probability
-			System.out.println("Percent Chance of ThunderStorms between 0-12 UTC Time: " + NBE_12H_THUNDERSTORM.get(i)[0]);
-			System.out.println("Percent Chance of ThunderStorms between 12-24 UTC Time: " + NBE_12H_THUNDERSTORM.get(i)[1]);
-			//Snow Amounts
-			System.out.println("0-12 UTC Time Snow Total in 1/10th Inches: " + NBE_12H_SNOW.get(i)[0]);
-			System.out.println("12-24 UTC Time Snow Total in 1/10th Inches: " + NBE_12H_SNOW.get(i)[1]);	
-			System.out.println("Total Snow in 1/10th Inches: " + Total_SNOW);
-			//Ice Amounts
-			System.out.println("0-12 UTC Time Ice Totals in 1/100th Inches: " + NBE_12H_ICE.get(i)[0]);
-			System.out.println("12-24 UTC Time Ice Totals in 1/100th Inches: " + NBE_12H_ICE.get(i)[1]);
-			System.out.println("Total Ice in 1/100th Inches: " + Total_ICE);
-			
-			//Guidances
-			//Temperature Guidances
-			if(maxT != null && minT != null){
-				checkTempGuidances(Integer.parseInt(maxT),Integer.parseInt(minT),maxMax,maxMin,minMax,minMin);
-			}
-			//Sustained Wind, Wind Gust, Thunderstorm guidances
-			if(NBE_WIND_SPEED.get(i)[0] != null && NBE_WIND_SPEED.get(i)[1] != null){
-				checkStormGuidances(Math.max(Integer.parseInt(NBE_WIND_SPEED.get(i)[0]), Integer.parseInt(NBE_WIND_SPEED.get(i)[1])),
-						Math.max(Integer.parseInt(NBE_GUSTS.get(i)[0]), Integer.parseInt(NBE_GUSTS.get(i)[1])),
-						Math.max(Integer.parseInt(NBE_12H_THUNDERSTORM.get(i)[0]),Integer.parseInt(NBE_12H_THUNDERSTORM.get(i)[1]))
-						);
-			}
-			//Heavy Rain, Heavy Snow
-			System.out.println("****************");
-		}
-	}
-	//Sustained Winds, Gust Winds, Thunderstorm Probabilities
-	private void checkStormGuidances(int MAX_SUS_WINDS,int MAX_WIND_GUSTS,int THUNDER_PROB) {
-		int[] MAX_SUS_WIND_VALUES = {25,35,45,55,65};
-		int[] WIND_GUST_VALUES = {35,47,59,71,83};
-		int[] THUNDER_VALUES = {15,23,31,39,47,55};
-		String SUS_WIND_GUIDANCE = "";
-		String WIND_GUST_GUIDANCE = "";
-		String THUNDER_GUIDANCE  = "";
-		for(int i = 0;i < MAX_SUS_WIND_VALUES.length;i++){
-			if(MAX_SUS_WINDS >= MAX_SUS_WIND_VALUES[i]){
-				SUS_WIND_GUIDANCE += "I";
-			}
-		}
-		for(int i = 0;i < WIND_GUST_VALUES.length;i++){
-			if(MAX_WIND_GUSTS >= WIND_GUST_VALUES[i]){
-				WIND_GUST_GUIDANCE += "I";
-			}
-		}		
-		for(int i = 0;i < THUNDER_VALUES.length;i++){
-			if(THUNDER_PROB >= THUNDER_VALUES[i]){
-				THUNDER_GUIDANCE += "I";
-			}
-		}		
-		if(SUS_WIND_GUIDANCE.length() == 0){
-			System.out.println("NO SUSTAINED WINDS GUIDANCE");
-		}
-		else{
-			System.out.println("SUSTAINED WIND GUIDANCE LEVEL: " + SUS_WIND_GUIDANCE);
-		}
+public class Main {
+	//NOAA NBM Download Link
+	String NOAA_NBM_BASE_LINK = "https://nomads.ncep.noaa.gov/pub/data/nccf/com/blend/prod/blend.";
+	String NOAA_NBM_BASE_DATE = "20210319";//YYYYMMDD
+	String NOAA_NBM_BASE_CYCLE = "1";//ANY NUMBER BETWEEN 0 and 22
+	String NOAA_NBM_NBE = "blend_nbetx.t";
+	String NOAA_NBM_NBH = "blend_nbhtx.t";
+	String NOAA_NBM_NBP = "blend_nbptx.t";
+	String NOAA_NBM_NBS = "blend_nbstx.t";
+	String NOAA_NBM_NBX = "blend_nbxtx.t";
+	//Global Variables for Date and Time
+	Date date = new Date();
+	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+	String year,month,day;
+	String UTC_TIME;
+	//Data Class, this class literally holds infinite weather data
+	Data data = new Data();
+	//Downloading Class that handles all the downloading and parsing of the info
+	Downloader downloader = new Downloader(data);
+	//Station Name, Station table at: https://vlab.ncep.noaa.gov/web/mdl/nbm-stations-v4.0 or NOAA Forecast
+	String STATION = "KHIO";
+	//NOAA NBM Cycle Times
+	int[] NBM_CYCLE_TIMES = {1,7,13,19};
+	//NAM THUNDER STUFF and Cycle Times
+	String NAM_THUNDER_BASE_LINK = "http://www.meteo.psu.edu/bufkit/data/NAM/";
+	int[] NAM_CYCLE_TIMES = {00,06,12,18};
+	//HRRR THUNDER STUFF
+	String HRRR_THUNDER_BASE_LINK = "http://www.meteo.psu.edu/bufkit/data/HRRR/";
+	//19/hrrr_khio.buf
+	public Main() throws Exception{
+		//Getting the Date and Time
 		
-		if(WIND_GUST_GUIDANCE.length() == 0){
-			System.out.println("NO WIND GUST GUIDANCE");
+		cal.setTime(date);
+		year = Integer.toString(cal.get(Calendar.YEAR));
+		month = Integer.toString(cal.get(Calendar.MONTH)+1);//Months start at 1 not 0
+		day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
+		
+		//RETRIEVE_NOAA_NBM_DATA();
+		//RETRIEVE_NOAA_MOS_DATA();
+		//RETRIEVE_NAM_THUNDER();
+		RETRIEVE_HRRR_THUNDER();
+	}
+	//Retrieving Severe Weather Info From HRRR
+	private void RETRIEVE_HRRR_THUNDER() throws Exception{
+		String HRRR_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
+		if(Integer.parseInt(HRRR_TIME) <= 2){//about a 2hr delay in HRRR info
+			HRRR_TIME = Integer.toString(21+Integer.parseInt(HRRR_TIME));
 		}
 		else{
-			System.out.println("WIND GUST GUIDANCE LEVEL: " + WIND_GUST_GUIDANCE);
+			HRRR_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY)-2);
 		}
-		if(THUNDER_GUIDANCE.length() == 0){
-			System.out.println("NO THUNDERSTORM GUIDANCE");
+		String HRRR_LINK = HRRR_THUNDER_BASE_LINK + HRRR_TIME + "/hrrr_" + STATION.toLowerCase() + ".buf";
+		downloader.HRRR_THUNDER(HRRR_LINK);
+	}
+	//Retrieving Severe Weather Info From NAM
+	private void RETRIEVE_NAM_THUNDER() throws Exception{
+		//Example Link: http://www.meteo.psu.edu/bufkit/data/NAM/18/nam_khio.buf
+		//Adjusting to Correct Cycle Time
+		String NAM_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
+		System.out.println(NAM_TIME);
+
+		int index = 0;
+		for(int i = 0;i < NAM_CYCLE_TIMES.length;i++){
+			if(Integer.parseInt(NAM_TIME) > NAM_CYCLE_TIMES[i]+2){
+				index++;
+			}
+		}
+		if(index == 1 || index == 0){
+			NAM_TIME = Integer.toString(NAM_CYCLE_TIMES[3]);
 		}
 		else{
-			System.out.println("THUNDERSTORM GUIDANCE LEVEL: " + THUNDER_GUIDANCE);
+			NAM_TIME = Integer.toString(NAM_CYCLE_TIMES[index-2]);
 		}
+		//Building the Link
+		String NAM_LINK = NAM_THUNDER_BASE_LINK + NAM_TIME + "/nam_" + STATION.toLowerCase() + ".buf";
+		downloader.NAM_THUNDER(NAM_LINK);
+	}
+	//NOAA MOS RETRIEVAL, NAM AND GFS(SHORT AND LONG RANGE)
+	private void RETRIEVE_NOAA_MOS_DATA() {
+		//Key Guide: https://vlab.ncep.noaa.gov/web/mdl/met-card
+		//GFS SHORT and LONG RANGE MOS(MAV AND MEX): https://ftpprd.ncep.noaa.gov/data/nccf/com/gfs/prod/
+		//NAM MOS: https://ftpprd.ncep.noaa.gov/data/nccf/com/nam/prod/
 		
 	}
-	private void checkTempGuidances(int maxT,int minT,int maxMax,int maxMin,int minMax,int minMin) {
-		int[] HEAT_GUIDANCE_TEMPS = {95,100,105,110,115,120}; 
-		int[] COLD_GUIDANCE_TEMPS = {15,5,-5,-15,-25,-35};
-		String HEAT_GUIDANCE = "";
-		String COLD_GUIDANCE = "";
-		for(int i = 0;i < HEAT_GUIDANCE_TEMPS.length;i++){
-			if(maxT >= HEAT_GUIDANCE_TEMPS[i]){
-				HEAT_GUIDANCE += "I";
+	//NOAA NBM RETRIEVAL
+	private void RETRIEVE_NOAA_NBM_DATA() throws Exception {
+		//NBP has special rules, needs to be on a cycle time(01,7,13,19)
+		NOAA_NBM_BASE_CYCLE = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
+		int temp_time = Integer.parseInt(NOAA_NBM_BASE_CYCLE);
+		int index = 0;
+		for(int i = 0;i < NBM_CYCLE_TIMES.length;i++){
+			if(temp_time > NBM_CYCLE_TIMES[i]){
+				index++;
 			}
 		}
-		for(int i = 0;i < COLD_GUIDANCE_TEMPS.length;i++){
-			if(maxT <= COLD_GUIDANCE_TEMPS[i]){
-				COLD_GUIDANCE += "I";
-			}
-		}
-		if(HEAT_GUIDANCE.length() == 0){
-			System.out.println("NO HEAT GUIDANCES");
+		if(index != 0){
+			NOAA_NBM_BASE_CYCLE = Integer.toString(NBM_CYCLE_TIMES[index-1]);
 		}
 		else{
-			System.out.println("HEAT GUIDANCE LEVEL: " + HEAT_GUIDANCE);
-		}
-		if(COLD_GUIDANCE.length() == 0){
-			System.out.println("NO COLD GUIDANCES");
-		}
-		else{
-			System.out.println("COLD GUIDANCE LEVEL: " + COLD_GUIDANCE);
-		}
-	}
-	//NAM SEVERE WEATHER 
-	public void NAM(ArrayList<String> temp_NAM) {
-		// TODO Auto-generated method stub
-		String line;
-		for(int i = 0;i < temp_NAM.size();i++){
-			line = temp_NAM.get(i);
-			if(line.contains("STIM")){
-				ArrayList<String> TEMP = new ArrayList<>();
-				TEMP.add(temp_NAM.get(i));
-				TEMP.add(temp_NAM.get(i+1));
-				TEMP.add(temp_NAM.get(i+2));
-				TEMP.add(temp_NAM.get(i+3));
-				TEMP.add(temp_NAM.get(i+4));
-				NAM_TRIPLET T = new NAM_TRIPLET(TEMP);
-				NAM_DATA.add(T);
-			}
+			day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH)-1);
+			NOAA_NBM_BASE_CYCLE = Integer.toString(NBM_CYCLE_TIMES[3]);
 		}
 		
-		for(int i = 0;i < NAM_DATA.size();i++){
-			System.out.println("***********");
-			for(int a = 0;a < NAM_DATA.get(i).raw_data.size();a++){
-				System.out.println(NAM_DATA.get(i).raw_data.get(a));
-			}
-			System.out.println("***********");
+		if(month.length() == 1){
+			month = "0" + month;
 		}
+		NOAA_NBM_BASE_DATE = year+month+day;
+
+		System.out.println(NOAA_NBM_BASE_DATE + " , " + NOAA_NBM_BASE_CYCLE +" UTC Time");
+		//Building the Proper Strings
+		String NOAA_NBM_NBE_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBE + NOAA_NBM_BASE_CYCLE + "z";
+		String NOAA_NBM_NBP_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBP + NOAA_NBM_BASE_CYCLE + "z";
+		
+		//downloader.NOAA_NBE(NOAA_NBM_NBE_LINK,STATION);
+		downloader.NOAA_NBE(NOAA_NBM_NBE_LINK,STATION);
+		
+		
 	}
-}
-class NAM_TRIPLET{
-	ArrayList<String> raw_data = new ArrayList<>();
-	//Metrics
-	String Forecast_Hour;
-	String Showalter_Index;
-	public NAM_TRIPLET(ArrayList<String> rd){
-		raw_data = rd;
-		interpret_Data();
-	}
-	private void interpret_Data() {
-		//1st Line contains Forecast Hour
-		String Forecast_Hour = raw_data.get(0).substring(7);
-		Forecast_Hour = Forecast_Hour.replaceAll("\\s","");
-		//System.out.println(Forecast_Hour);
-		//2nd Line Contains Showalter Index
-		Showalter_Index = raw_data.get(1).substring(7,15);
-		//System.out.println(Showalter_Index);
+	public static void main(String[] args) throws Exception {
+		Main m = new Main();
 	}
 }
