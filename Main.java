@@ -24,7 +24,7 @@ public class Main {
 	//Downloading Class that handles all the downloading and parsing of the info
 	Downloader downloader = new Downloader(data);
 	//Station Name, Station table at: https://vlab.ncep.noaa.gov/web/mdl/nbm-stations-v4.0 or NOAA Forecast
-	String STATION = "KHIO";
+	String STATION = "KMGM";
 	//NOAA NBM Cycle Times
 	int[] NBM_CYCLE_TIMES = {1,7,13,19};
 	//NAM THUNDER STUFF and Cycle Times
@@ -32,6 +32,10 @@ public class Main {
 	int[] NAM_CYCLE_TIMES = {00,06,12,18};
 	//HRRR THUNDER STUFF
 	String HRRR_THUNDER_BASE_LINK = "http://www.meteo.psu.edu/bufkit/data/HRRR/";
+	//RAP THUNDER STUFF
+	String RAP_THUNDER_BASE_LINK = "http://www.meteo.psu.edu/bufkit/data/RAP/";
+	//GFS THUNDER STUFF
+	String GFS_THUNDER_BASE_LINK = "http://www.meteo.psu.edu/bufkit/data/GFS/";
 	//19/hrrr_khio.buf
 	public Main() throws Exception{
 		//Getting the Date and Time
@@ -43,9 +47,48 @@ public class Main {
 		
 		//RETRIEVE_NOAA_NBM_DATA();
 		//RETRIEVE_NOAA_MOS_DATA();
-		//RETRIEVE_NAM_THUNDER();
+		RETRIEVE_NAM_THUNDER();
 		RETRIEVE_HRRR_THUNDER();
+		RETRIEVE_RAP_THUNDER();
+		RETRIEVE_GFS_THUNDER();
+		data.printSevereWeatherSummary();
 	}
+	//Retrieving Severe Weather Info From GFS
+	private void RETRIEVE_GFS_THUNDER() throws Exception{
+		//Example Link: http://www.meteo.psu.edu/bufkit/data/NAM/18/nam_khio.buf
+		//Adjusting to Correct Cycle Time
+		String GFS_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
+		int index = 0;
+		for(int i = 0;i < NAM_CYCLE_TIMES.length;i++){
+			if(Integer.parseInt(GFS_TIME) > NAM_CYCLE_TIMES[i]+2){
+				index++;
+			}
+		}
+		if(index == 1 || index == 0){
+			GFS_TIME = Integer.toString(NAM_CYCLE_TIMES[3]);
+		}
+		else{
+			GFS_TIME = Integer.toString(NAM_CYCLE_TIMES[index-2]);
+		}
+		if(GFS_TIME.equals("6") || GFS_TIME.equals("0")){
+			GFS_TIME = "0" + GFS_TIME;
+		}
+		//Building the Link
+		String NAM_LINK = GFS_THUNDER_BASE_LINK + GFS_TIME + "/gfs3_" + STATION.toLowerCase() + ".buf";
+		downloader.THUNDER_DOWNLOADER(NAM_LINK,"GFS",GFS_TIME);
+	}
+	//Retrieving Severe Weather Infor From RAP
+	private void RETRIEVE_RAP_THUNDER() throws Exception{
+		String RAP_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
+		if(Integer.parseInt(RAP_TIME) <= 2){//about a 2hr delay in HRRR info
+			RAP_TIME = Integer.toString(21+Integer.parseInt(RAP_TIME));
+		}
+		else{
+			RAP_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY)-2);
+		}
+		String RAP_LINK = RAP_THUNDER_BASE_LINK + RAP_TIME + "/rap_" + STATION.toLowerCase() + ".buf";
+		downloader.THUNDER_DOWNLOADER(RAP_LINK,"RAP",RAP_TIME);
+	}	
 	//Retrieving Severe Weather Info From HRRR
 	private void RETRIEVE_HRRR_THUNDER() throws Exception{
 		String HRRR_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
@@ -56,15 +99,13 @@ public class Main {
 			HRRR_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY)-2);
 		}
 		String HRRR_LINK = HRRR_THUNDER_BASE_LINK + HRRR_TIME + "/hrrr_" + STATION.toLowerCase() + ".buf";
-		downloader.HRRR_THUNDER(HRRR_LINK);
+		downloader.THUNDER_DOWNLOADER(HRRR_LINK,"HRRR",HRRR_TIME);
 	}
 	//Retrieving Severe Weather Info From NAM
 	private void RETRIEVE_NAM_THUNDER() throws Exception{
 		//Example Link: http://www.meteo.psu.edu/bufkit/data/NAM/18/nam_khio.buf
 		//Adjusting to Correct Cycle Time
 		String NAM_TIME = Integer.toString(cal.get(Calendar.HOUR_OF_DAY));
-		System.out.println(NAM_TIME);
-
 		int index = 0;
 		for(int i = 0;i < NAM_CYCLE_TIMES.length;i++){
 			if(Integer.parseInt(NAM_TIME) > NAM_CYCLE_TIMES[i]+2){
@@ -77,9 +118,12 @@ public class Main {
 		else{
 			NAM_TIME = Integer.toString(NAM_CYCLE_TIMES[index-2]);
 		}
+		if(NAM_TIME.equals("6") || NAM_TIME.equals("0")){
+			NAM_TIME = "0" + NAM_TIME;
+		}
 		//Building the Link
 		String NAM_LINK = NAM_THUNDER_BASE_LINK + NAM_TIME + "/nam_" + STATION.toLowerCase() + ".buf";
-		downloader.NAM_THUNDER(NAM_LINK);
+		downloader.THUNDER_DOWNLOADER(NAM_LINK,"NAM",NAM_TIME);
 	}
 	//NOAA MOS RETRIEVAL, NAM AND GFS(SHORT AND LONG RANGE)
 	private void RETRIEVE_NOAA_MOS_DATA() {
