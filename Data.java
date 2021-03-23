@@ -20,6 +20,10 @@ public class Data {
 	ArrayList<TRIPLET> NAM_DATA = new ArrayList<>();
 	//HRRR Data
 	ArrayList<TRIPLET> HRRR_DATA = new ArrayList<>();	
+	//RAP Data
+	ArrayList<TRIPLET> RAP_DATA = new ArrayList<>();
+	//GFS Data
+	ArrayList<TRIPLET> GFS_DATA = new ArrayList<>();
 	
 	
 	public void NBP(ArrayList<String> nbp){
@@ -252,44 +256,102 @@ public class Data {
 			System.out.println("COLD GUIDANCE LEVEL: " + COLD_GUIDANCE);
 		}
 	}
-	//NAM SEVERE WEATHER 
-	public void NAM(ArrayList<String> temp_NAM) {
+	//SEVERE WEATHER MODELS
+	public void SEVERE_WEATHER(ArrayList<String> model_data, String model,String Start_Time){
 		// TODO Auto-generated method stub
 		String line;
-		for(int i = 0;i < temp_NAM.size();i++){
-			line = temp_NAM.get(i);
+		ArrayList<TRIPLET> temp = new ArrayList<>();
+		for(int i = 0;i < model_data.size();i++){
+			line = model_data.get(i);
 			if(line.contains("STIM")){
 				ArrayList<String> TEMP = new ArrayList<>();
-				TEMP.add(temp_NAM.get(i));
-				TEMP.add(temp_NAM.get(i+1));
-				TEMP.add(temp_NAM.get(i+2));
-				TEMP.add(temp_NAM.get(i+3));
-				TEMP.add(temp_NAM.get(i+4));
-				TRIPLET T = new TRIPLET(TEMP);
-				NAM_DATA.add(T);
-			}
-		}
-	}
-	public void HRRR(ArrayList<String> temp_HRRR) {
-		// TODO Auto-generated method stub
-		String line;
-		for(int i = 0;i < temp_HRRR.size();i++){
-			line = temp_HRRR.get(i);
-			if(line.contains("STIM")){
-				ArrayList<String> TEMP = new ArrayList<>();
-				TEMP.add(temp_HRRR.get(i));
-				TEMP.add(temp_HRRR.get(i+1));
-				TEMP.add(temp_HRRR.get(i+2));
-				TEMP.add(temp_HRRR.get(i+3));
-				TEMP.add(temp_HRRR.get(i+4));
-				TRIPLET T = new TRIPLET(TEMP);
-				NAM_DATA.add(T);
+				TEMP.add(model_data.get(i));
+				TEMP.add(model_data.get(i+1));
+				TEMP.add(model_data.get(i+2));
+				TEMP.add(model_data.get(i+3));
+				TEMP.add(model_data.get(i+4));
+				TRIPLET T = new TRIPLET(TEMP,model,Start_Time);
+				temp.add(T);
 			}
 		}		
+		if(model.equals("NAM")){
+			NAM_DATA = temp;
+		}
+		else if(model.equals("HRRR")){
+			HRRR_DATA = temp;
+		}
+		else if(model.equals("RAP")){
+			RAP_DATA = temp;
+		}
+		else if(model.equals("GFS")){
+			GFS_DATA = temp;
+		}
+	}
+	//Prints all of the data out of the models in a tabular format
+	public void printSevereWeatherSummary() {
+		int RAP_HRRR_TIME = Integer.parseInt(RAP_DATA.get(0).Start_Time);
+		int GFS_NAM_TIME = Integer.parseInt(GFS_DATA.get(0).Start_Time);
+		int DIFF;
+		if(RAP_HRRR_TIME > GFS_NAM_TIME){
+			DIFF = RAP_HRRR_TIME - GFS_NAM_TIME;
+		}
+		else{
+			DIFF = (23-GFS_NAM_TIME) + RAP_HRRR_TIME;
+		}
+		System.out.println("MODELS         GFS   |   NAM   |   HRRR   |   RAP");
+		System.out.println(DIFF);
+		for(int i = 0;i < GFS_DATA.size();i++){
+			String GFS_FH = "N/A",NAM_FH = "N/A",HRRR_FH = "N/A",RAP_FH = "N/A";//Forecast Hour
+			String GFS_SI = "N/A",NAM_SI = "N/A",HRRR_SI = "N/A",RAP_SI = "N/A";//Showalter Index
+			//Forecast Hour
+			if(i < DIFF){
+				GFS_FH = Integer.toString(GFS_DATA.get(i).FH);
+				NAM_FH = Integer.toString(NAM_DATA.get(i).FH);
+				GFS_SI = Double.toString(GFS_DATA.get(i).SI);
+				NAM_SI = Double.toString(NAM_DATA.get(i).SI);
+			}
+			else{
+				//HRRR
+				if(i-DIFF < HRRR_DATA.size()){
+					HRRR_FH = Integer.toString(HRRR_DATA.get(i-DIFF).FH);
+					HRRR_SI = Double.toString(HRRR_DATA.get(i-DIFF).SI);
+				}
+				else{
+					HRRR_FH = "N/A";
+					HRRR_SI = "N/A";
+				}
+				//NAM
+				if(i < NAM_DATA.size()){
+					NAM_FH = Integer.toString(NAM_DATA.get(i).FH);
+					NAM_SI = Double.toString(NAM_DATA.get(i).SI);
+				}
+				else{
+					NAM_FH = "N/A";
+					NAM_SI = "N/A";
+				}
+				//RAP
+				if(i-DIFF < RAP_DATA.size()){
+					RAP_FH = Integer.toString(RAP_DATA.get(i-DIFF).FH);
+					HRRR_SI = Double.toString(RAP_DATA.get(i-DIFF).SI);
+				}
+				else{
+					RAP_FH = "N/A";
+					RAP_SI = "N/A";
+				}
+				//GFS
+				GFS_FH = Integer.toString(GFS_DATA.get(i).FH);
+				GFS_SI = Double.toString(GFS_DATA.get(i).SI);
+			}
+			System.out.println("Forecast Hour:   " + GFS_FH + "   |   " + NAM_FH + "   |   " + HRRR_FH + "   |   " + RAP_FH);
+			System.out.println("Showalter Index:   " + GFS_SI + "   |   " + NAM_SI + "   |   " + HRRR_SI + "   |   " + RAP_SI);
+		}
 	}
 }
+//Class That Deals with Severe Weather Parameters
 class TRIPLET{
 	ArrayList<String> raw_data = new ArrayList<>();
+	String Model;
+	String Start_Time;
 	//Metrics
 	String Forecast_Hour;
 	String Showalter_Index;
@@ -309,8 +371,10 @@ class TRIPLET{
 	String LI_ANALYSIS;
 	String CAPE_ANALYSIS;
 	String BRN_ANALYSIS;
-	public TRIPLET(ArrayList<String> rd){
+	public TRIPLET(ArrayList<String> rd,String model,String S_T){
 		raw_data = rd;
+		Model = model;
+		Start_Time = S_T;
 		interpret_Data();
 	}
 	private void interpret_Data() {
@@ -398,16 +462,7 @@ class TRIPLET{
 		else{
 			BRN_ANALYSIS = "Environemnt Unlikely to Generate SuperCells, CAPE too High but some pulse storms";
 		}
-		printSynopsis();
-	}
-	private void printSynopsis() {
-		System.out.println("***************");
-		System.out.println("Effective for Forecast Hour: " + FH);
-		System.out.println("Showalter Index is " + SI + ", which indicates that " + SI_ANALYSIS);
-		System.out.println("Lifted Index is " + LI + ", which indicates that there is a " + LI_ANALYSIS);
-		System.out.println("CAPE values are: " + CAPE_ANALYSIS);
-		System.out.println("Bulk Richardson Number value is: " + Bulk_RichardSon_Number + " ," + BRN_ANALYSIS);
-		System.out.println("***************");
+		//printSynopsis();
 	}
 	//Equal Counter Function
 	private String Equal_Counter(int num,int line){
