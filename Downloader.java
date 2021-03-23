@@ -67,52 +67,36 @@ public class Downloader {
 		}
 		data.NBP(NBP_RAW);
 	}
-	public void NAM_THUNDER(String LINK) throws Exception{
+	//Thunder Data Downloader
+	public void THUNDER_DOWNLOADER(String LINK,String model,String Start_Time) throws Exception{
 		System.out.println(LINK);
 		URL url = new URL(LINK);
 		InputStream is = url.openStream();
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		String line = null;
+		ArrayList<String> temp = new ArrayList<>();
 		while((line = br.readLine()) != null){
 			if(line.contains("YYMMDD/HHMM")){//This is the other part of NAM
 				break;
 			}
 			else{
-				NAM_RAW.add(line);
+				temp.add(line);
 			}
 		}
-		ArrayList<String> temp_NAM = new ArrayList<>();
+		ArrayList<String> temp_Temp = new ArrayList<>();
 		//Removing unnecessary atmosphere pressure lines
-		for(int i = 0;i < NAM_RAW.size();i++){
-			if(NAM_RAW.get(i).contains("STIM") || NAM_RAW.get(i).contains("SHOW") 
-					|| NAM_RAW.get(i).contains("LCLP") || NAM_RAW.get(i).contains("LCLT") || NAM_RAW.get(i).contains("BRCH")){
-				temp_NAM.add(NAM_RAW.get(i));
+		for(int i = 0;i < temp.size();i++){
+			if(temp.get(i).contains("STIM") || temp.get(i).contains("SHOW") 
+					|| temp.get(i).contains("LCLP") || temp.get(i).contains("LCLT") || temp.get(i).contains("BRCH")){
+				temp_Temp.add(temp.get(i));
 			}
 		}
-		data.NAM(temp_NAM);
-	}
-	public void HRRR_THUNDER(String LINK) throws Exception{
-		System.out.println(LINK);
-		URL url = new URL(LINK);
-		InputStream is = url.openStream();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String line = null;
-		while((line = br.readLine()) != null){
-			if(line.contains("YYMMDD/HHMM")){//This is the other part of NAM
-				break;
-			}
-			else{
-				HRRR_RAW.add(line);
-			}
+		if(model.equals("NAM")){
+			NAM_RAW = temp_Temp;
 		}
-		ArrayList<String> temp_NAM = new ArrayList<>();
-		//Removing unnecessary atmosphere pressure lines
-		for(int i = 0;i < HRRR_RAW.size();i++){
-			if(HRRR_RAW.get(i).contains("STIM") || HRRR_RAW.get(i).contains("SHOW") 
-					|| HRRR_RAW.get(i).contains("LCLP") || HRRR_RAW.get(i).contains("LCLT") || HRRR_RAW.get(i).contains("BRCH")){
-				temp_NAM.add(HRRR_RAW.get(i));
-			}
-		}
-		data.HRRR(temp_NAM);		
+		else if(model.equals("HRRR")){
+			HRRR_RAW = temp_Temp;
+		}		
+		data.SEVERE_WEATHER(temp_Temp,model,Start_Time);
 	}
 }
