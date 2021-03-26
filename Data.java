@@ -298,52 +298,212 @@ public class Data {
 		else{
 			DIFF = (23-GFS_NAM_TIME) + RAP_HRRR_TIME;
 		}
-		System.out.println("MODELS         GFS   |   NAM   |   HRRR   |   RAP");
-		System.out.println(DIFF);
+		System.out.println("PARAMETERS,GFS,NAM,HRRR,RAP,AVERAGE");
 		for(int i = 0;i < GFS_DATA.size();i++){
 			String GFS_FH = "N/A",NAM_FH = "N/A",HRRR_FH = "N/A",RAP_FH = "N/A";//Forecast Hour
 			String GFS_SI = "N/A",NAM_SI = "N/A",HRRR_SI = "N/A",RAP_SI = "N/A";//Showalter Index
+			String GFS_LI = "N/A",NAM_LI = "N/A",HRRR_LI = "N/A",RAP_LI = "N/A";//LIFTED Index
+			String GFS_CP = "N/A",NAM_CP = "N/A",HRRR_CP = "N/A",RAP_CP = "N/A";//CAPE
+			String GFS_BRN = "N/A",NAM_BRN = "N/A",HRRR_BRN = "N/A",RAP_BRN = "N/A";//Bulk RichardSon Number
+			double SI_AVG = 0,LI_AVG = 0,CAPE_AVG = 0,BRN_AVG = 0;
+			int num_models = 0;//Number of models operating at a given forecasting hour
 			//Forecast Hour
 			if(i < DIFF){
 				GFS_FH = Integer.toString(GFS_DATA.get(i).FH);
 				NAM_FH = Integer.toString(NAM_DATA.get(i).FH);
 				GFS_SI = Double.toString(GFS_DATA.get(i).SI);
 				NAM_SI = Double.toString(NAM_DATA.get(i).SI);
+				GFS_LI = Double.toString(GFS_DATA.get(i).LI);
+				NAM_LI = Double.toString(NAM_DATA.get(i).LI);
+				GFS_CP = Double.toString(GFS_DATA.get(i).CAPE_VALUE);
+				NAM_CP = Double.toString(NAM_DATA.get(i).CAPE_VALUE);
+				GFS_BRN = Double.toString(GFS_DATA.get(i).BRN);
+				NAM_BRN = Double.toString(NAM_DATA.get(i).BRN);
+				//Averages
+				SI_AVG += GFS_DATA.get(i).SI + NAM_DATA.get(i).SI;
+				LI_AVG += GFS_DATA.get(i).LI + NAM_DATA.get(i).LI;
+				CAPE_AVG += GFS_DATA.get(i).CAPE_VALUE + NAM_DATA.get(i).CAPE_VALUE;
+				BRN_AVG += GFS_DATA.get(i).BRN + NAM_DATA.get(i).BRN;
+				num_models = 2;
 			}
 			else{
 				//HRRR
 				if(i-DIFF < HRRR_DATA.size()){
 					HRRR_FH = Integer.toString(HRRR_DATA.get(i-DIFF).FH);
 					HRRR_SI = Double.toString(HRRR_DATA.get(i-DIFF).SI);
+					HRRR_LI = Double.toString(HRRR_DATA.get(i-DIFF).LI);
+					HRRR_CP = Double.toString(HRRR_DATA.get(i-DIFF).CAPE_VALUE);
+					HRRR_BRN = Double.toString(HRRR_DATA.get(i-DIFF).BRN);
+					SI_AVG += HRRR_DATA.get(i-DIFF).SI;
+					LI_AVG += HRRR_DATA.get(i-DIFF).LI;
+					CAPE_AVG += HRRR_DATA.get(i-DIFF).CAPE_VALUE;
+					BRN_AVG += HRRR_DATA.get(i-DIFF).BRN;
+					num_models++;
 				}
 				else{
-					HRRR_FH = "N/A";
-					HRRR_SI = "N/A";
+					HRRR_FH = "?";
+					HRRR_SI = "?";
+					HRRR_LI = "?";
+					HRRR_CP = "?";
+					HRRR_BRN = "?";
 				}
 				//NAM
 				if(i < NAM_DATA.size()){
 					NAM_FH = Integer.toString(NAM_DATA.get(i).FH);
 					NAM_SI = Double.toString(NAM_DATA.get(i).SI);
+					NAM_LI = Double.toString(NAM_DATA.get(i).LI);
+					NAM_CP = Double.toString(NAM_DATA.get(i).CAPE_VALUE);
+					NAM_BRN = Double.toString(NAM_DATA.get(i-DIFF).BRN);
+					SI_AVG += NAM_DATA.get(i).SI;
+					LI_AVG += NAM_DATA.get(i).LI;
+					CAPE_AVG += NAM_DATA.get(i).CAPE_VALUE;
+					BRN_AVG += NAM_DATA.get(i-DIFF).BRN;
+					num_models++;
 				}
 				else{
-					NAM_FH = "N/A";
-					NAM_SI = "N/A";
+					NAM_FH = "?";
+					NAM_SI = "?";
+					NAM_LI = "?";
+					NAM_CP = "?";
+					NAM_BRN = "?";
 				}
 				//RAP
 				if(i-DIFF < RAP_DATA.size()){
 					RAP_FH = Integer.toString(RAP_DATA.get(i-DIFF).FH);
-					HRRR_SI = Double.toString(RAP_DATA.get(i-DIFF).SI);
+					RAP_SI = Double.toString(RAP_DATA.get(i-DIFF).SI);
+					RAP_LI = Double.toString(RAP_DATA.get(i-DIFF).LI);
+					RAP_CP = Double.toString(RAP_DATA.get(i-DIFF).CAPE_VALUE);
+					RAP_BRN = Double.toString(RAP_DATA.get(i-DIFF).BRN);
+					SI_AVG += RAP_DATA.get(i-DIFF).SI;
+					LI_AVG += RAP_DATA.get(i-DIFF).LI;
+					CAPE_AVG += RAP_DATA.get(i-DIFF).CAPE_VALUE;
+					BRN_AVG += RAP_DATA.get(i-DIFF).BRN;
+					num_models++;
 				}
 				else{
-					RAP_FH = "N/A";
-					RAP_SI = "N/A";
+					RAP_FH = "?";
+					RAP_SI = "?";
+					RAP_LI = "?";
+					RAP_CP = "?";
+					RAP_BRN = "?";
 				}
 				//GFS
 				GFS_FH = Integer.toString(GFS_DATA.get(i).FH);
 				GFS_SI = Double.toString(GFS_DATA.get(i).SI);
+				GFS_LI = Double.toString(GFS_DATA.get(i).LI);
+				GFS_CP = Double.toString(GFS_DATA.get(i).CAPE_VALUE);
+				GFS_BRN = Double.toString(GFS_DATA.get(i).BRN);
+				SI_AVG += GFS_DATA.get(i).SI;
+				LI_AVG += GFS_DATA.get(i).LI;
+				CAPE_AVG += GFS_DATA.get(i).CAPE_VALUE;
+				BRN_AVG += GFS_DATA.get(i).BRN;
+				num_models++;
 			}
-			System.out.println("Forecast Hour:   " + GFS_FH + "   |   " + NAM_FH + "   |   " + HRRR_FH + "   |   " + RAP_FH);
-			System.out.println("Showalter Index:   " + GFS_SI + "   |   " + NAM_SI + "   |   " + HRRR_SI + "   |   " + RAP_SI);
+			SI_AVG /= num_models;
+			LI_AVG /= num_models;
+			CAPE_AVG /= num_models;
+			BRN_AVG /= num_models;
+			//CSV Output
+			
+			//System.out.println("FH," + GFS_FH + "," + NAM_FH + "," + HRRR_FH + "," + RAP_FH);
+			//System.out.println("SI," + GFS_SI + "," + NAM_SI + "," + HRRR_SI + "," + RAP_SI + "," + SI_AVG);
+			//System.out.println("LI," + GFS_LI + "," + NAM_LI + "," + HRRR_LI + "," + RAP_LI + "," + LI_AVG);
+			//System.out.println("CAPE," + GFS_CP + "," + NAM_CP + "," + HRRR_CP + "," + RAP_CP + "," + CAPE_AVG);
+			//System.out.println("BRN," + GFS_BRN + "," + NAM_BRN + "," + HRRR_BRN + "," + RAP_BRN + "," + BRN_AVG);
+			
+			//Text Based Forecast
+			//No Severe Weather Threats Anytime Soon
+			String[] CONF_LEVEL = {"LOW","MODERATE","HIGH","VERY HIGH"};
+			double[] CAPE_LEVEL = {500,1000,1500,2500}; 
+			String[] CAPE_ANALYSIS = {"Marginally Unstable","Moderately Unstable","Very Unstable","Extremely Unstable"};
+			double[] SI_LEVEL = {3,1,-2.5,-6};
+			String[] SI_ANALYSIS = {"No threat of Severe Weather","Rain Showers with possibly some thunderstorms","Thundershowers are likely","Severe Thunderstorms are possible","Severe Thunderstorms are possible with Tornadoes a possibility"};
+			double[] LI_LEVEL = {-1,-3,-5};
+			String[] LI_ANALYSIS = {"No Potential for Severe Weather","Weak Potential for Severe Weather","Moderate Potential for Severe Weather","Strong Potential for Severe Weather"};
+			double[] BRN_LEVEL = {10,20,45};
+			String[] BRN_ANALYSIS = {"Environemnt Unlikely to Generate SuperCells, SHEAR too high but can potentially still generate Supercells","Environment Optimal for Supercell Storms","Environment able to generate SuperCell Storms","Environemnt Unlikely to Generate SuperCells, CAPE too High but some pulse storms possible"};
+			
+			double Forecast_Hour_Score = 0;
+			int CAPE_INDEX = 0,SI_INDEX = 0,LI_INDEX = 0;
+		    double BRN_INDEX = 0;
+			for(int a = 0;a < CAPE_LEVEL.length;a++){
+				if(CAPE_AVG >= CAPE_LEVEL[a]){
+					CAPE_INDEX++;
+				}
+			}
+			for(int a = 0;a < SI_LEVEL.length;a++){
+				if(SI_AVG <= SI_LEVEL[a]){
+					SI_INDEX++;
+				}
+			}
+			for(int a = 0;a < LI_LEVEL.length;a++){
+				if(LI_AVG <= LI_LEVEL[a]){
+					LI_INDEX++;
+				}
+			}
+			//BRN is the hardest one cause an average doesn't work that well, a high and a low one can put it int
+			if(GFS_DATA.get(i).BRN < 10){
+				BRN_INDEX += 1;
+			}
+			if((i < NAM_DATA.size()) && NAM_DATA.get(i).BRN < 10){
+				BRN_INDEX += 1;
+			}
+			if((i-DIFF < HRRR_DATA.size() && i >=  DIFF) && HRRR_DATA.get(i-DIFF).BRN < 10){
+				BRN_INDEX += 1;
+			}
+			if((i-DIFF < RAP_DATA.size() && i >=  DIFF) && RAP_DATA.get(i-DIFF).BRN < 10){
+				BRN_INDEX += 1;
+			}
+			
+			if(GFS_DATA.get(i).BRN >= 10 && GFS_DATA.get(i).BRN <= 20){
+				BRN_INDEX += 4;
+			}
+			if((i < NAM_DATA.size()) && NAM_DATA.get(i).BRN >= 10 && NAM_DATA.get(i).BRN <= 20){
+				BRN_INDEX += 4;
+			}
+			if((i-DIFF < HRRR_DATA.size() && i >=  DIFF) && HRRR_DATA.get(i-DIFF).BRN >= 10 && HRRR_DATA.get(i-DIFF).BRN <= 20){
+				BRN_INDEX += 4;
+			}
+			if((i-DIFF < RAP_DATA.size() && i >=  DIFF) && RAP_DATA.get(i-DIFF).BRN >= 10 && RAP_DATA.get(i-DIFF).BRN <= 20){
+				BRN_INDEX += 4;
+			}
+			if(GFS_DATA.get(i).BRN > 20 && GFS_DATA.get(i).BRN <= 45){
+				BRN_INDEX += 2;
+			}
+			if((i < NAM_DATA.size()) && NAM_DATA.get(i).BRN > 20 && NAM_DATA.get(i).BRN <= 45){
+				BRN_INDEX += 2;
+			}
+			if((i-DIFF < HRRR_DATA.size() && i >=  DIFF) && HRRR_DATA.get(i-DIFF).BRN > 20 && HRRR_DATA.get(i-DIFF).BRN <= 45){
+				BRN_INDEX += 2;
+			}
+			if((i-DIFF < RAP_DATA.size() && i >=  DIFF) && RAP_DATA.get(i-DIFF).BRN > 20 && RAP_DATA.get(i-DIFF).BRN <= 45){
+				BRN_INDEX += 2;
+			}
+			if(GFS_DATA.get(i).BRN > 45){
+				BRN_INDEX += 1;
+			}
+			if((i < NAM_DATA.size()) && NAM_DATA.get(i).BRN > 45){
+				BRN_INDEX += 1;
+			}
+			if((i-DIFF < RAP_DATA.size() && i >=  DIFF) && RAP_DATA.get(i-DIFF).BRN > 45){
+				BRN_INDEX += 1;
+			}
+			if((i-DIFF < HRRR_DATA.size() && i >=  DIFF) && HRRR_DATA.get(i-DIFF).BRN > 45){
+				BRN_INDEX += 1;
+			}
+			BRN_INDEX /= num_models;
+			Forecast_Hour_Score = (CAPE_INDEX*SI_INDEX) + (CAPE_INDEX*LI_INDEX) + (CAPE_INDEX*BRN_INDEX);
+			if(Forecast_Hour_Score >= 1){
+				System.out.println("FORECAST HOUR: " + GFS_DATA.get(i).FH);
+				//System.out.println("FH," + GFS_FH + "," + NAM_FH + "," + HRRR_FH + "," + RAP_FH);
+				System.out.println("SI," + GFS_SI + "," + NAM_SI + "," + HRRR_SI + "," + RAP_SI + "," + SI_AVG);
+				System.out.println("LI," + GFS_LI + "," + NAM_LI + "," + HRRR_LI + "," + RAP_LI + "," + LI_AVG);
+				System.out.println("CAPE," + GFS_CP + "," + NAM_CP + "," + HRRR_CP + "," + RAP_CP + "," + CAPE_AVG);
+				System.out.println("BRN," + GFS_BRN + "," + NAM_BRN + "," + HRRR_BRN + "," + RAP_BRN + "," + BRN_AVG);
+				System.out.println("FORECAST SCORE: " + Forecast_Hour_Score);
+			}
+			
+			//System.out.println("Confidence Level in this Forecast Hour: " + CONF_LEVEL[num_models-1]);
 		}
 	}
 }
