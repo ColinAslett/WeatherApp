@@ -24,7 +24,7 @@ public class Main {
 	//Downloading Class that handles all the downloading and parsing of the info
 	Downloader downloader = new Downloader(data);
 	//Station Name, Station table at: https://vlab.ncep.noaa.gov/web/mdl/nbm-stations-v4.0 or NOAA Forecast
-	String STATION = "KMGM";
+	String STATION = "LIN";
 	//NOAA NBM Cycle Times
 	int[] NBM_CYCLE_TIMES = {1,7,13,19};
 	//NAM THUNDER STUFF and Cycle Times
@@ -45,7 +45,7 @@ public class Main {
 		month = Integer.toString(cal.get(Calendar.MONTH)+1);//Months start at 1 not 0
 		day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
 		
-		//RETRIEVE_NOAA_NBM_DATA();
+		RETRIEVE_NOAA_NBM_DATA();
 		//RETRIEVE_NOAA_MOS_DATA();
 		RETRIEVE_NAM_THUNDER();
 		RETRIEVE_HRRR_THUNDER();
