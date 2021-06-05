@@ -405,11 +405,11 @@ public class Data {
 			BRN_AVG /= num_models;
 			//CSV Output
 			
-			//System.out.println("FH," + GFS_FH + "," + NAM_FH + "," + HRRR_FH + "," + RAP_FH);
-			//System.out.println("SI," + GFS_SI + "," + NAM_SI + "," + HRRR_SI + "," + RAP_SI + "," + SI_AVG);
-			//System.out.println("LI," + GFS_LI + "," + NAM_LI + "," + HRRR_LI + "," + RAP_LI + "," + LI_AVG);
-			//System.out.println("CAPE," + GFS_CP + "," + NAM_CP + "," + HRRR_CP + "," + RAP_CP + "," + CAPE_AVG);
-			//System.out.println("BRN," + GFS_BRN + "," + NAM_BRN + "," + HRRR_BRN + "," + RAP_BRN + "," + BRN_AVG);
+			System.out.println("FH," + GFS_FH + "," + NAM_FH + "," + HRRR_FH + "," + RAP_FH);
+			System.out.println("SI," + GFS_SI + "," + NAM_SI + "," + HRRR_SI + "," + RAP_SI + "," + SI_AVG);
+			System.out.println("LI," + GFS_LI + "," + NAM_LI + "," + HRRR_LI + "," + RAP_LI + "," + LI_AVG);
+			System.out.println("CAPE," + GFS_CP + "," + NAM_CP + "," + HRRR_CP + "," + RAP_CP + "," + CAPE_AVG);
+			System.out.println("BRN," + GFS_BRN + "," + NAM_BRN + "," + HRRR_BRN + "," + RAP_BRN + "," + BRN_AVG);
 			
 			//Text Based Forecast
 			//No Severe Weather Threats Anytime Soon
@@ -494,13 +494,13 @@ public class Data {
 			BRN_INDEX /= num_models;
 			Forecast_Hour_Score = (CAPE_INDEX*SI_INDEX) + (CAPE_INDEX*LI_INDEX) + (CAPE_INDEX*BRN_INDEX);
 			if(Forecast_Hour_Score >= 1){
-				System.out.println("FORECAST HOUR: " + GFS_DATA.get(i).FH);
+				//System.out.println("FORECAST HOUR: " + GFS_DATA.get(i).FH);
 				//System.out.println("FH," + GFS_FH + "," + NAM_FH + "," + HRRR_FH + "," + RAP_FH);
-				System.out.println("SI," + GFS_SI + "," + NAM_SI + "," + HRRR_SI + "," + RAP_SI + "," + SI_AVG);
-				System.out.println("LI," + GFS_LI + "," + NAM_LI + "," + HRRR_LI + "," + RAP_LI + "," + LI_AVG);
-				System.out.println("CAPE," + GFS_CP + "," + NAM_CP + "," + HRRR_CP + "," + RAP_CP + "," + CAPE_AVG);
-				System.out.println("BRN," + GFS_BRN + "," + NAM_BRN + "," + HRRR_BRN + "," + RAP_BRN + "," + BRN_AVG);
-				System.out.println("FORECAST SCORE: " + Forecast_Hour_Score);
+				//System.out.println("SI," + GFS_SI + "," + NAM_SI + "," + HRRR_SI + "," + RAP_SI + "," + SI_AVG);
+				//System.out.println("LI," + GFS_LI + "," + NAM_LI + "," + HRRR_LI + "," + RAP_LI + "," + LI_AVG);
+				//System.out.println("CAPE," + GFS_CP + "," + NAM_CP + "," + HRRR_CP + "," + RAP_CP + "," + CAPE_AVG);
+				//System.out.println("BRN," + GFS_BRN + "," + NAM_BRN + "," + HRRR_BRN + "," + RAP_BRN + "," + BRN_AVG);
+				//System.out.println("FORECAST SCORE: " + Forecast_Hour_Score);
 			}
 			
 			//System.out.println("Confidence Level in this Forecast Hour: " + CONF_LEVEL[num_models-1]);
