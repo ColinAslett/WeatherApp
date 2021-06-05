@@ -11,3 +11,6 @@ List of Weather Models that are incldued
 <li>NAM CONUS</li>
 <li>RAP</li>
 </ol>
+
+##June 2021 Update:
+Most of the bugs have been fixed, except a small one where the NBE projections are not displayed correctly if its a specific time in the day. THe text output is pretty cluttered currently, and the user still cannot choose weather station which is set to KHIO(Hillsboro Airport, Oregon) as default. Hopefully by the end of this month all these issues will be resolved. There are a few things that I am still not extracting from the weather models that could enhance my forecasts so that will be the next step after I finish the other issues.
