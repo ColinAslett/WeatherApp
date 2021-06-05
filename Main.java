@@ -24,7 +24,7 @@ public class Main {
 	//Downloading Class that handles all the downloading and parsing of the info
 	Downloader downloader = new Downloader(data);
 	//Station Name, Station table at: https://vlab.ncep.noaa.gov/web/mdl/nbm-stations-v4.0 or NOAA Forecast
-	String STATION = "LIN";
+	String STATION = "KHIO";
 	//NOAA NBM Cycle Times
 	int[] NBM_CYCLE_TIMES = {1,7,13,19};
 	//NAM THUNDER STUFF and Cycle Times
@@ -154,12 +154,16 @@ public class Main {
 		if(month.length() == 1){
 			month = "0" + month;
 		}
+		//The day needs to be 2 characters long, so if its between the 1st and 9th we need to add a zero to the front
+		if(day.length() == 1){
+			day = "0" + day;
+		}
 		NOAA_NBM_BASE_DATE = year+month+day;
 
 		System.out.println(NOAA_NBM_BASE_DATE + " , " + NOAA_NBM_BASE_CYCLE +" UTC Time");
 		//Building the Proper Strings
 		String NOAA_NBM_NBE_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBE + NOAA_NBM_BASE_CYCLE + "z";
-		String NOAA_NBM_NBP_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBP + NOAA_NBM_BASE_CYCLE + "z";
+		//String NOAA_NBM_NBP_LINK = NOAA_NBM_BASE_LINK + NOAA_NBM_BASE_DATE + "/" + NOAA_NBM_BASE_CYCLE + "/text/" + NOAA_NBM_NBP + NOAA_NBM_BASE_CYCLE + "z";
 		
 		//downloader.NOAA_NBE(NOAA_NBM_NBE_LINK,STATION);
 		downloader.NOAA_NBE(NOAA_NBM_NBE_LINK,STATION);
